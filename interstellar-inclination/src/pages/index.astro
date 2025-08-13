@@ -1,0 +1,22 @@
+---
+const WP = import.meta.env.WP_URL;
+const res = await fetch(`${WP}/wp-json/wp/v2/posts?_embed&per_page=10`, { cache: 'no-store' });
+if (!res.ok) throw new Error('WP fetch failed');
+const posts = await res.json();
+function esc(s){ return s?.toString() ?? '' }
+---
+<html lang="ja">
+  <head><meta charset="utf-8" /><title>Blog</title></head>
+  <body>
+    <main style="max-width:720px;margin:2rem auto;padding:1rem;">
+      <h1>Blog</h1>
+      <ul>
+        {posts.map((p:any) => (
+          <li>
+            <a href={`/${encodeURIComponent(p.slug)}/`} set:html={p.title.rendered}></a>
+          </li>
+        ))}
+      </ul>
+    </main>
+  </body>
+</html>

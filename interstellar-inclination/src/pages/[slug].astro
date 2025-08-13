@@ -1,0 +1,24 @@
+---
+import { Astro } from 'astro';
+const WP = import.meta.env.WP_URL;
+
+const slug = decodeURIComponent(Astro.params.slug || '');
+const res = await fetch(`${WP}/wp-json/wp/v2/posts?_embed&slug=${encodeURIComponent(slug)}`, { cache: 'no-store' });
+const arr = res.ok ? await res.json() : [];
+const post = arr[0];
+if (!post) {
+  return Astro.redirect('/404');
+}
+---
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>{post.title.rendered.replace(/<[^>]*>/g,'')}</title>
+  </head>
+  <body>
+    <main style="max-width:720px;margin:2rem auto;padding:1rem;">
+      <h1 set:html={post.title.rendered}></h1>
+      <article set:html={post.content.rendered}></article>
+    </main>
+  </body>
+</html>
